@@ -16,8 +16,8 @@
     "package.json"
   ],
   "dependencies": {
-    "edgee": "^0.1.6",
-    "zod": "^3.23.8"
+    "@paperclipai/adapter-utils": "^2026.416.0",
+    "edgee": "^0.1.6"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

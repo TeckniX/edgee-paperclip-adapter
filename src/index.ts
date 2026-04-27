@@ -1,20 +1,20 @@
-export const type = "edgee_compressed";
-export const label = "Edgee Compressed";
+import type { ServerAdapterModule } from "@paperclipai/adapter-utils";
 
-export const models = [
-  { id: "anthropic/claude-haiku-4-5", label: "Claude Haiku (Fast)" },
-  { id: "anthropic/claude-sonnet-4-5", label: "Claude Sonnet (Balanced)" },
-  { id: "anthropic/claude-opus-4-5", label: "Claude Opus (Power)" },
-  { id: "openai/gpt-4o", label: "GPT-4o" },
-  { id: "openai/gpt-4o-mini", label: "GPT-4o Mini" },
-  { id: "google/gemma-2-9b", label: "Gemma 2 9B" },
-  { id: "meta/llama-3.1-70b", label: "Llama 3.1 70B" },
-  { id: "meta/llama-3.1-8b", label: "Llama 3.1 8B" },
-  { id: "mistral/mistral-large", label: "Mistral Large" },
-  { id: "mistral/mistral-small", label: "Mistral Small" },
-];
+import { type, label, models, type EdgeeAdapterConfig, type SupportedModel } from "./metadata.js";
+import { execute, testEnvironment } from "./server/execute.js";
 
-export const agentConfigurationDoc = `# edgee_compressed agent configuration
+export { type, label, models, type EdgeeAdapterConfig, type SupportedModel };
+
+export function createServerAdapter(): ServerAdapterModule {
+  return {
+    type,
+    models,
+    execute,
+    testEnvironment,
+    supportsLocalAgentJwt: false,
+    supportsInstructionsBundle: false,
+    requiresMaterializedRuntimeSkills: false,
+    agentConfigurationDoc: `# edgee_compressed agent configuration
 
 Adapter: edgee_compressed
 
@@ -32,13 +32,6 @@ Notes:
 - This adapter routes all LLM requests through Edgee AI Gateway for token compression
 - Compression reduces token usage and costs while maintaining response quality
 - Works with any model supported by Edgee (Anthropic, OpenAI, Google, Meta, Mistral)
-`;
-
-export type EdgeeAdapterConfig = {
-  wrappedAdapterType?: string;
-  wrappedAdapterConfig?: Record<string, unknown>;
-  edgeeApiKey: string;
-  edgeeModel: string;
-};
-
-export type SupportedModel = typeof models[number]["id"];
+`,
+  };
+}

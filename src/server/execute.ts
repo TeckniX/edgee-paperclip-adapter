@@ -1,187 +1,92 @@
 import Edgee from "edgee";
-import { type } from "../index.js";
-import type { EdgeeAdapterConfig } from "../index.js";
-
-export interface AdapterExecutionContext {
-  prompt: string;
-  systemPrompt?: string;
-  model: string;
-  config: EdgeeAdapterConfig;
-  env: Record<string, string>;
-}
-
-export interface AdapterResult {
-  transcript: TranscriptEntry[];
-  usage?: UsageInfo;
-  finishReason?: string;
-  error?: string;
-}
-
-export interface TranscriptEntry {
-  type: "text" | "tool-call" | "tool-result" | "error";
-  content: string;
-  timestamp: number;
-}
-
-export interface UsageInfo {
-  inputTokens: number;
-  outputTokens: number;
-  totalTokens: number;
-  cost: number;
-  compression?: CompressionInfo;
-}
-
-export interface CompressionInfo {
-  savedTokens: number;
-  reduction: number;
-  costSavings: number;
-  timeMs: number;
-}
+import {
+  type AdapterExecutionContext,
+  type AdapterExecutionResult,
+  type AdapterEnvironmentTestContext,
+  type AdapterEnvironmentTestResult,
+  type AdapterEnvironmentCheck,
+} from "@paperclipai/adapter-utils";
+import { type } from "../metadata.js";
+import type { EdgeeAdapterConfig } from "../metadata.js";
 
 export async function execute(
   context: AdapterExecutionContext
-): Promise<AdapterResult> {
-  const { prompt, systemPrompt, config } = context;
+): Promise<AdapterExecutionResult> {
+  const config = context.config as unknown as EdgeeAdapterConfig;
   const { edgeeApiKey, edgeeModel } = config;
 
   if (!edgeeApiKey) {
     return {
-      transcript: [
-        {
-          type: "error",
-          content: "Edgee API key not configured. Please set edgeeApiKey in adapter config.",
-          timestamp: Date.now(),
-        },
-      ],
-      error: "Missing Edgee API key",
+      exitCode: 1,
+      signal: null,
+      timedOut: false,
+      errorMessage: "Edgee API key not configured. Please set edgeeApiKey in adapter config.",
+      usage: { inputTokens: 0, outputTokens: 0 },
     };
   }
 
   try {
     const edgee = new Edgee(edgeeApiKey);
+    const model = edgeeModel || "anthropic/claude-sonnet-4-5";
 
-    const startTime = Date.now();
     const response = await edgee.send({
-      model: edgeeModel as string,
-      input: prompt,
-      ...(systemPrompt && { systemPrompt }),
+      model,
+      input: context.context?.prompt as string || "",
     });
 
-    const endTime = Date.now();
-    const timeMs = endTime - startTime;
-
-    const transcript: TranscriptEntry[] = [
-      {
-        type: "text",
-        content: response.text || "",
-        timestamp: endTime,
+    return {
+      exitCode: 0,
+      signal: null,
+      timedOut: false,
+      usage: {
+        inputTokens: response.usage?.prompt_tokens || 0,
+        outputTokens: response.usage?.completion_tokens || 0,
       },
-    ];
-
-    const usage: UsageInfo = {
-      inputTokens: response.usage?.prompt_tokens || 0,
-      outputTokens: response.usage?.completion_tokens || 0,
-      totalTokens: response.usage?.total_tokens || 0,
-      cost: 0,
-    };
-
-    if (response.compression) {
-      usage.cost = response.compression.cost_savings || 0;
-      usage.compression = {
-        savedTokens: response.compression.saved_tokens || 0,
-        reduction: response.compression.reduction || 0,
-        costSavings: response.compression.cost_savings || 0,
-        timeMs,
-      };
-    }
-
-    return {
-      transcript,
-      usage,
-      finishReason: response.finishReason || "stop",
+      summary: response.text || "",
     };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     return {
-      transcript: [
-        {
-          type: "error",
-          content: `Edgee execution error: ${errorMessage}`,
-          timestamp: Date.now(),
-        },
-      ],
-      error: errorMessage,
+      exitCode: 1,
+      signal: null,
+      timedOut: false,
+      errorMessage,
+      usage: { inputTokens: 0, outputTokens: 0 },
     };
   }
 }
 
-export async function executeStream(
-  context: AdapterExecutionContext,
-  onChunk: (chunk: string) => void
-): Promise<AdapterResult> {
-  const { prompt, config } = context;
-  void context.systemPrompt; // SDK doesn't support systemPrompt in stream mode
-  const { edgeeApiKey, edgeeModel } = config;
-
-  if (!edgeeApiKey) {
+const checkEdgeeApiKey = (key: string | undefined): AdapterEnvironmentCheck => {
+  if (!key) {
     return {
-      transcript: [
-        {
-          type: "error",
-          content: "Edgee API key not configured. Please set edgeeApiKey in adapter config.",
-          timestamp: Date.now(),
-        },
-      ],
-      error: "Missing Edgee API key",
+      code: "no_api_key",
+      level: "error",
+      message: "Edgee API key not configured",
+      detail: "Please set edgeeApiKey in adapter config",
     };
   }
-
-  try {
-    const edgee = new Edgee(edgeeApiKey);
-    let fullText = "";
-    let finishReason = "stop";
-
-    for await (const chunk of edgee.stream(edgeeModel as string, prompt)) {
-      if (chunk.text) {
-        fullText += chunk.text;
-        onChunk(chunk.text);
-      }
-      if (chunk.finishReason) {
-        finishReason = chunk.finishReason;
-      }
-    }
-
-    const endTime = Date.now();
-
-    return {
-      transcript: [
-        {
-          type: "text",
-          content: fullText,
-          timestamp: endTime,
-        },
-      ],
-      finishReason,
-    };
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    return {
-      transcript: [
-        {
-          type: "error",
-          content: `Edgee stream error: ${errorMessage}`,
-          timestamp: Date.now(),
-        },
-      ],
-      error: errorMessage,
-    };
-  }
-}
-
-export const adapter = {
-  type,
-  execute,
-  executeStream,
+  return {
+    code: "api_key_found",
+    level: "info",
+    message: "Edgee API key is configured",
+  };
 };
 
-export default adapter;
+export async function testEnvironment(
+  ctx: AdapterEnvironmentTestContext
+): Promise<AdapterEnvironmentTestResult> {
+  const config = ctx.config as unknown as EdgeeAdapterConfig;
+  const checks: AdapterEnvironmentCheck[] = [];
+
+  const apiKeyCheck = checkEdgeeApiKey(config.edgeeApiKey);
+  checks.push(apiKeyCheck);
+
+  const status = checks.some((c) => c.level === "error") ? "fail" : checks.some((c) => c.level === "warn") ? "warn" : "pass";
+
+  return {
+    adapterType: type,
+    status,
+    checks,
+    testedAt: new Date().toISOString(),
+  };
+}
