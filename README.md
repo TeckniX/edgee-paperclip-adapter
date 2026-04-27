@@ -11,18 +11,11 @@ A [Paperclip](https://docs.paperclip.ing) adapter that routes all LLM requests t
 
 ## Installation
 
-### Option 1: Install from npm
+### Install from npm
 
 ```bash
 npm install @tecknix/edgee-paperclip-adapter
 ```
-
-### Option 2: Install from local directory
-
-In Paperclip's Adapter Manager UI, point to the adapter's `dist` folder. The dist folder must contain:
-- `index.js` — Main entry point
-- `index.d.ts` — TypeScript declarations
-- `package.json` — Package configuration
 
 ## Quick Start
 
@@ -88,51 +81,6 @@ Create issues in Paperclip and assign them to your Edgee-enabled agent. Each run
 git clone https://github.com/edgee-ai/edgee-paperclip-adapter
 cd edgee-paperclip-adapter
 npm install
-```
-
-### Build
-
-```bash
-npm run build
-```
-
-This outputs to the `dist/` folder.
-
-### Local Testing with Paperclip
-
-1. Build the adapter: `npm run build`
-2. In Paperclip Adapter Manager UI, select "Install from local folder"
-3. Point to the adapter's dist folder (e.g., `/path/to/edgee-paperclip-adapter/dist`)
-
-### Required Files in dist/
-
-When installing from a local directory, the `dist/` folder must contain:
-
-```
-dist/
-├── index.js           # Main entry - exports createServerAdapter()
-├── index.d.ts        # TypeScript declarations  
-├── index.d.tsmap     # Declaration map (optional)
-├── index.js.map      # Source map (optional)
-├── metadata.js      # Type, label, models
-├── metadata.d.ts
-├── server/
-│   ├── index.js     # Server exports
-│   └── execute.js   # execute() and testEnvironment()
-└── package.json    # Must export "." as entry point
-```
-
-The `dist/package.json` must have:
-
-```json
-{
-  "name": "@tecknix/edgee-paperclip-adapter",
-  "main": "./index.js",
-  "types": "./index.d.ts",
-  "exports": {
-    ".": "./index.js"
-  }
-}
 ```
 
 ### Type Check

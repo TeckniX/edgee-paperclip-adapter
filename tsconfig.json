@@ -4,7 +4,6 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "lib": ["ES2022"],
-    "outDir": "./dist",
     "rootDir": "./src",
     "declaration": true,
     "declarationMap": true,
@@ -21,5 +20,5 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "tests"]
+  "exclude": ["node_modules", "tests"]
 }

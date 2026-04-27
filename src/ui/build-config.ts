@@ -1,4 +1,4 @@
-import type { EdgeeAdapterConfig } from "../metadata.js";
+import type { EdgeeAdapterConfig } from "../index.js";
 
 export interface ConfigFormValues {
   edgeeApiKey?: string;

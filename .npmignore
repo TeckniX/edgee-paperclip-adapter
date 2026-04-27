@@ -1,16 +1,9 @@
-# Source files
-src/
-tests/
-
 # Development
 .git
 .gitignore
 .env
 .env.*
-tsconfig.json
 vitest.config.ts
-*.ts
-!*.d.ts
 
 # IDE
 .vscode/
@@ -21,11 +14,6 @@ vitest.config.ts
 # OS
 .DS_Store
 Thumbs.db
-
-# Documentation
-README.md
-LICENSE
-docs/
 
 # CI/CD
 .github/

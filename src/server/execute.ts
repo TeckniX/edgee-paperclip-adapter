@@ -6,8 +6,8 @@ import {
   type AdapterEnvironmentTestResult,
   type AdapterEnvironmentCheck,
 } from "@paperclipai/adapter-utils";
-import { type } from "../metadata.js";
-import type { EdgeeAdapterConfig } from "../metadata.js";
+import { type } from "../index.js";
+import type { EdgeeAdapterConfig } from "../index.js";
 
 export async function execute(
   context: AdapterExecutionContext

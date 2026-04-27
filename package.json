@@ -1,18 +1,12 @@
 {
   "name": "@tecknix/edgee-paperclip-adapter",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Edgee compressed adapter for Paperclip AI - routes LLM traffic through Edgee for token compression",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "type": "module",
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "build": "tsc && node scripts/copy-packagejson.js",
-    "copy:packagejson": "node -e \"const p=require('./package.json'),fs=require('fs');delete p.scripts;delete p.devDependencies;delete p.publishConfig;p.main='./index.js';p.types='./index.d.ts';p.exports={'.'. './index.js','./server':'./server/index.js'};fs.writeFileSync('./dist/package.json',JSON.stringify(p,null,2))\"",
-    "dev": "tsc --watch",
-    "publish": "npm run build && npm publish",
-    "clean": "rm -rf dist"
+    "dev": "tsc --watch"
   },
   "dependencies": {
     "@paperclipai/adapter-utils": "^2026.416.0",
@@ -25,5 +19,25 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TeckniX/edgee-paperclip-adapter.git"
+  },
+  "keywords": [
+    "paperclip",
+    "ai-agent",
+    "edgee",
+    "adapter",
+    "orchestration"
+  ],
+  "author": "TeckniX",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TeckniX/edgee-paperclip-adapter/issues"
+  },
+  "homepage": "https://github.com/TeckniX/edgee-paperclip-adapter#readme"
 }
