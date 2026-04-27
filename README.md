@@ -15,7 +15,7 @@ Edgee is an AI Gateway that optimizes LLM requests by compressing prompts and re
 ## Installation
 
 ```bash
-npm install @paperclipai/adapter-edgee
+npm install @paperclipai/edgee-paperclip-adapter
 ```
 
 ### Prerequisites
@@ -30,13 +30,13 @@ npm install @paperclipai/adapter-edgee
 Add to your Paperclip server's adapter registry (`server/src/adapters/registry.ts`):
 
 ```typescript
-import * as edgeeLocal from "@paperclipai/adapter-edgee";
+import * as edgeeLocal from "@paperclipai/edgee-paperclip-adapter";
 import {
   execute,
   executeStream,
   testEnvironment,
   parseStdout,
-} from "@paperclipai/adapter-edgee/server";
+} from "@paperclipai/edgee-paperclip-adapter/server";
 
 registry.set("edgee_compressed", {
   ...edgeeLocal,
