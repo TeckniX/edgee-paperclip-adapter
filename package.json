@@ -9,7 +9,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "build": "tsc",
-    "publish": "npm run build && npm publish"
+    "dev": "tsc --watch",
+    "publish": "npm run build && npm publish",
+    "clean": "rm -rf dist"
   },
   "dependencies": {
     "@paperclipai/adapter-utils": "^2026.416.0",

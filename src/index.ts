@@ -3,7 +3,7 @@ import type { ServerAdapterModule } from "@paperclipai/adapter-utils";
 import { type, label, models, type EdgeeAdapterConfig, type SupportedModel } from "./metadata.js";
 import { execute, testEnvironment } from "./server/execute.js";
 
-export { type, label, models, type EdgeeAdapterConfig, type SupportedModel };
+export { type, label, models, EdgeeAdapterConfig, SupportedModel };
 
 export function createServerAdapter(): ServerAdapterModule {
   return {
