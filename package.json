@@ -11,10 +11,6 @@
     "build": "tsc",
     "publish": "npm run build && npm publish"
   },
-  "files": [
-    "dist",
-    "package.json"
-  ],
   "dependencies": {
     "@paperclipai/adapter-utils": "^2026.416.0",
     "edgee": "^0.1.6"
