@@ -1,6 +1,6 @@
 {
   "name": "@tecknix/edgee-paperclip-adapter",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Edgee compressed adapter for Paperclip AI - routes LLM traffic through Edgee for token compression",
   "type": "module",
   "main": "./src/index.js",
