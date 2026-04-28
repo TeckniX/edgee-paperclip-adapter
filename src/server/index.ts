@@ -17,19 +17,12 @@ export function createServerAdapter(): ServerAdapterModule {
       return {
         fields: [
           {
-            key: "edgeeApiKey",
-            label: "Edgee API Key",
-            type: "text",
-            required: true,
-            hint: "Your Edgee API key for token compression via Edgee AI Gateway",
-          },
-          {
             key: "edgeeModel",
             label: "Edgee Model",
             type: "select",
             options: modelOptions,
             default: "anthropic/claude-sonnet-4-5",
-            hint: "Model to use via Edgee gateway (defaults to Claude Sonnet)",
+            hint: "Model to use via Edgee gateway (defaults to Claude Sonnet). Set EDGEE_API_KEY env var (can be sealed as secret).",
           },
         ],
       };

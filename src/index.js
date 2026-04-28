@@ -23,7 +23,7 @@ Don't use when:
 - Your use case has specific compliance requirements for direct model access
 
 Core fields:
-- edgeeApiKey (string, required): Your Edgee API key for token compression
+- EDGEE_API_KEY (env variable, required): Your Edgee API key - set as env variable and seal as secret
 - edgeeModel (string, optional): Model to use via Edgee gateway
 
 Operational fields:
