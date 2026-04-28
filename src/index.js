@@ -1,23 +1,17 @@
 export const type = "edgee_compressed";
 export const label = "Edgee Compressed";
 export const models = [
-  { id: "anthropic/claude-haiku-4-5", label: "Claude Haiku (Fast)" },
-  { id: "anthropic/claude-sonnet-4-5", label: "Claude Sonnet (Balanced)" },
-  { id: "anthropic/claude-opus-4-5", label: "Claude Opus (Power)" },
-  { id: "openai/gpt-4o", label: "GPT-4o" },
-  { id: "openai/gpt-4o-mini", label: "GPT-4o Mini" },
-  { id: "google/gemma-2-9b", label: "Gemma 2 9B" },
-  { id: "meta/llama-3.1-70b", label: "Llama 3.1 70B" },
-  { id: "meta/llama-3.1-8b", label: "Llama 3.1 8B" },
-  { id: "mistral/mistral-large", label: "Mistral Large" },
-  { id: "mistral/mistral-small", label: "Mistral Small" },
+    { id: "anthropic/claude-haiku-4-5", label: "Claude Haiku (Fast)" },
+    { id: "anthropic/claude-sonnet-4-5", label: "Claude Sonnet (Balanced)" },
+    { id: "anthropic/claude-opus-4-5", label: "Claude Opus (Power)" },
+    { id: "openai/gpt-4o", label: "GPT-4o" },
+    { id: "openai/gpt-4o-mini", label: "GPT-4o Mini" },
+    { id: "google/gemma-2-9b", label: "Gemma 2 9B" },
+    { id: "meta/llama-3.1-70b", label: "Llama 3.1 70B" },
+    { id: "meta/llama-3.1-8b", label: "Llama 3.1 8B" },
+    { id: "mistral/mistral-large", label: "Mistral Large" },
+    { id: "mistral/mistral-small", label: "Mistral Small" },
 ];
-
-export type EdgeeAdapterConfig = {
-  edgeeApiKey: string;
-  edgeeModel?: string;
-};
-
 export const agentConfigurationDoc = `# edgee_compressed agent configuration
 
 Use when:
@@ -36,5 +30,5 @@ Operational fields:
 - timeoutSec (number, optional): Execution timeout in seconds
 - graceSec (number, optional): Grace period before SIGKILL
 `;
-
 export { createServerAdapter } from "./server/index.js";
+//# sourceMappingURL=index.js.map
