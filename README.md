@@ -1,4 +1,4 @@
-# Edgee Compressed Adapter
+# Edgee AI Adapter for Paperclip
 
 A [Paperclip](https://docs.paperclip.ing) adapter that routes all LLM requests through [Edgee AI Gateway](https://www.edgee.ai) for token compression and cost savings.
 
@@ -78,7 +78,7 @@ Create issues in Paperclip and assign them to your Edgee-enabled agent. Each run
 ### Clone and Setup
 
 ```bash
-git clone https://github.com/edgee-ai/edgee-paperclip-adapter
+git clone https://github.com/TeckniX/edgee-paperclip-adapter
 cd edgee-paperclip-adapter
 npm install
 ```
