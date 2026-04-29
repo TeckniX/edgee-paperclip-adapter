@@ -1,4 +1,4 @@
-import { asString, asNumber, parseObject } from "@paperclipai/adapter-utils/server-utils";
+import { asString, asNumber, parseObject, buildPaperclipEnv } from "@paperclipai/adapter-utils/server-utils";
 import { parseEdgeeResponse } from "./parse.js";
 import { type } from "../index.js";
 async function callEdgeeApi(params) {
@@ -28,8 +28,10 @@ async function callEdgeeApi(params) {
     }
 }
 export async function execute(ctx) {
-    const { config, context, onLog, onMeta } = ctx;
+    const { runId, agent, config, context, onLog, onMeta } = ctx;
     const envConfig = parseObject(config.env);
+    const env = { ...buildPaperclipEnv(agent) };
+    env.PAPERCLIP_RUN_ID = runId;
     const apiKey = process.env.EDGEE_API_KEY ?? asString(envConfig.EDGEE_API_KEY, "");
     const model = asString(config.model, "anthropic/claude-sonnet-4-5");
     const timeoutSec = asNumber(config.timeoutSec, 120);

@@ -21,12 +21,12 @@ npm install @tecknix/edgee-paperclip-adapter
 
 ### 1. Create an Edgee agent in Paperclip
 
-In the Paperclip UI, create an agent with adapter type `edgee_compressed`:
+In the Paperclip UI, create an agent with adapter type `edgee_ai`:
 
 ```json
 {
-  "name": "Edgee Coder",
-  "adapterType": "edgee_compressed",
+  "name": "Edgee AI",
+  "adapterType": "edgee_ai",
   "adapterConfig": {
     "edgeeApiKey": "your-edgee-api-key",
     "edgeeModel": "anthropic/claude-sonnet-4-5"

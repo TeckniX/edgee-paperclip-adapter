@@ -1,2 +1,14 @@
-export { execute } from "./execute.js";
-export { testEnvironment } from "./test.js";
+import type { ServerAdapterModule } from "@paperclipai/adapter-utils";
+import { type, models, agentConfigurationDoc } from "../index.js";
+import { execute } from "./execute.js";
+import { testEnvironment } from "./test.js";
+
+export function createServerAdapter(): ServerAdapterModule {
+    return {
+        type,
+        execute,
+        testEnvironment,
+        models,
+        agentConfigurationDoc,
+    };
+}
