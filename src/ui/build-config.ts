@@ -1,23 +1,26 @@
-import type { EdgeeAdapterConfig } from "../index.js";
+import type { CreateConfigValues } from "@paperclipai/adapter-utils";
 
-export interface ConfigFormValues {
-  edgeeModel?: string;
+function parseEnvVars(text: string): Record<string, string> {
+  const env: Record<string, string> = {};
+  for (const line of text.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const eq = trimmed.indexOf("=");
+    if (eq <= 0) continue;
+    const key = trimmed.slice(0, eq).trim();
+    const value = trimmed.slice(eq + 1);
+    if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key)) continue;
+    env[key] = value;
+  }
+  return env;
 }
 
-export function buildConfig(
-  values: ConfigFormValues
-): EdgeeAdapterConfig {
-  return {
-    edgeeModel: values.edgeeModel || "anthropic/claude-sonnet-4-5",
-  };
+export function buildEdgeeConfig(v: CreateConfigValues): Record<string, unknown> {
+  const ac: Record<string, unknown> = {};
+  if (v.model) ac.model = v.model;
+  ac.timeoutSec = 120;
+  ac.graceSec = 20;
+  const env = parseEnvVars(v.envVars || "");
+  if (Object.keys(env).length > 0) ac.env = env;
+  return ac;
 }
-
-export function parseConfig(
-  config: EdgeeAdapterConfig
-): ConfigFormValues {
-  return {
-    edgeeModel: config.edgeeModel,
-  };
-}
-
-export default { buildConfig, parseConfig };

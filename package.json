@@ -1,15 +1,16 @@
 {
   "name": "@tecknix/edgee-paperclip-adapter",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Edgee compressed adapter for Paperclip AI - routes LLM traffic through Edgee for token compression",
   "type": "module",
-  "main": "./src/index.js",
   "exports": {
-    ".": "./src/index.js",
-    "./ui-parser": "./src/ui/build-config.js"
+    ".": "./src/index.ts",
+    "./server": "./src/server/index.ts",
+    "./ui": "./src/ui/index.ts",
+    "./cli": "./src/cli/index.ts"
   },
-  "paperclip": {
-    "adapterUiParser": "1"
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
@@ -19,15 +20,12 @@
   },
   "dependencies": {
     "@paperclipai/adapter-utils": "^2026.416.0",
-    "edgee": "^0.1.6"
+    "picocolors": "^1.1.1"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
     "typescript": "^5.3.3",
     "vitest": "^4.1.5"
-  },
-  "publishConfig": {
-    "access": "public"
   },
   "directories": {
     "test": "tests"

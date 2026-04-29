@@ -1,73 +1,95 @@
-import Edgee from "edgee";
+import { asString, asNumber, parseObject } from "@paperclipai/adapter-utils/server-utils";
+import { parseEdgeeResponse } from "./parse.js";
 import { type } from "../index.js";
-export async function execute(context) {
-    const config = context.config;
-    const edgeeApiKey = process.env.EDGEE_API_KEY;
-    const { edgeeModel } = config;
-    if (!edgeeApiKey) {
+async function callEdgeeApi(params) {
+    const { apiKey, model, prompt, timeoutSec } = params;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutSec * 1000);
+    try {
+        const response = await fetch("https://api.edgee.ai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${apiKey}`,
+            },
+            body: JSON.stringify({
+                model,
+                messages: [{ role: "user", content: prompt }],
+            }),
+            signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+        const text = await response.text();
+        return { text, status: response.status, headers: Object.fromEntries(response.headers.entries()) };
+    }
+    catch (err) {
+        clearTimeout(timeoutId);
+        throw err;
+    }
+}
+export async function execute(ctx) {
+    const { config, context, onLog, onMeta } = ctx;
+    const envConfig = parseObject(config.env);
+    const apiKey = process.env.EDGEE_API_KEY ?? asString(envConfig.EDGEE_API_KEY, "");
+    const model = asString(config.model, "anthropic/claude-sonnet-4-5");
+    const timeoutSec = asNumber(config.timeoutSec, 120);
+    if (!apiKey) {
         return {
             exitCode: 1,
             signal: null,
             timedOut: false,
-            errorMessage: "Edgee API key not configured. Please set EDGEE_API_KEY environment variable (can be sealed as secret).",
+            errorMessage: "Edgee API key not configured. Set EDGEE_API_KEY in Permissions & Configuration → Environment Variables, then seal as secret.",
             usage: { inputTokens: 0, outputTokens: 0 },
         };
     }
-    try {
-        const edgee = new Edgee(edgeeApiKey);
-        const model = edgeeModel || "anthropic/claude-sonnet-4-5";
-        const response = await edgee.send({
-            model,
-            input: context.context?.prompt || "",
+    const promptTemplate = asString(config.promptTemplate, "");
+    const prompt = promptTemplate
+        ? promptTemplate.replace(/\{\{prompt\}\}/g, context.prompt || "")
+        : context.prompt || "";
+    if (onMeta) {
+        await onMeta({
+            adapterType: type,
+            command: "edgee-api",
         });
+    }
+    try {
+        if (onLog) {
+            await onLog("stdout", `[paperclip] Calling Edgee API with model: ${model}\n`);
+        }
+        const { text, status } = await callEdgeeApi({ apiKey, model, prompt, timeoutSec });
+        if (onLog) {
+            await onLog("stdout", `[paperclip] Edgee API response received (status: ${status})\n`);
+        }
+        const parsed = parseEdgeeResponse(text);
+        if (parsed.errorMessage) {
+            return {
+                exitCode: 1,
+                signal: null,
+                timedOut: false,
+                errorMessage: parsed.errorMessage,
+                usage: parsed.usage,
+                summary: parsed.summary,
+            };
+        }
         return {
             exitCode: 0,
             signal: null,
             timedOut: false,
-            usage: {
-                inputTokens: response.usage?.prompt_tokens || 0,
-                outputTokens: response.usage?.completion_tokens || 0,
-            },
-            summary: response.text || "",
+            usage: parsed.usage,
+            summary: parsed.summary,
+            resultJson: { stdout: text },
         };
     }
     catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
+        const timedOut = errorMessage.includes("abort");
         return {
             exitCode: 1,
             signal: null,
-            timedOut: false,
-            errorMessage,
+            timedOut,
+            errorMessage: timedOut ? `Timed out after ${timeoutSec}s` : errorMessage,
             usage: { inputTokens: 0, outputTokens: 0 },
         };
     }
-}
-const checkEdgeeApiKey = () => {
-    const key = process.env.EDGEE_API_KEY;
-    if (!key) {
-        return {
-            code: "no_api_key",
-            level: "error",
-            message: "Edgee API key not configured",
-            detail: "Please set EDGEE_API_KEY environment variable (can be sealed as secret)",
-        };
-    }
-    return {
-        code: "api_key_found",
-        level: "info",
-        message: "Edgee API key is configured",
-    };
-};
-export async function testEnvironment(_ctx) {
-    const checks = [];
-    const apiKeyCheck = checkEdgeeApiKey();
-    checks.push(apiKeyCheck);
-    const status = checks.some((c) => c.level === "error") ? "fail" : checks.some((c) => c.level === "warn") ? "warn" : "pass";
-    return {
-        adapterType: type,
-        status,
-        checks,
-        testedAt: new Date().toISOString(),
-    };
 }
 //# sourceMappingURL=execute.js.map
